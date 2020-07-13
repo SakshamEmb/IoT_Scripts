@@ -1,0 +1,64 @@
+	Data = "0x000000000000008c08010000013feb55ff74000f0ea850209a690000940000120000001e09010002000300040016014703f0001504c8000c0900730a00460b00501300464306d7440000b5000bb60007422e9f180000cd0386ce000107c700000000f10000601a46000001344800000bb84900000bb84a00000bb84c00000000024e0000000000000000cf00000000000000000100003fca"[2:]  
+	length = len(Data)
+	head = Data[0:8]               # Data ---> AvlData <<<< gps_element and io element 
+	avl_len = Data[8:16] 
+	codec_id = Data[16:18]
+	Num_data = Data[18:20]
+	avl_len = int(avl_len,16)
+	avl_data = Data[20:avl_len+20]
+	timestamp = avl_data[0:16]
+	priority = avl_data[16:18]
+	gps_element = avl_data[18:48]
+	io_Element = avl_data[48:avl_len]
+	##GPS_DATA
+	longitude = gps_element[0:8] 		#long_data = [ d,m,sec,msec,p]
+	longitude = LatLongCalc(longitude)
+	lattitude = gps_element[8:16]
+	alt = gps_element[16:20]
+	angle = gps_element[20:24]
+	Satellites = int(gps_element[24:26],16)	
+	speed = gps_element[26:30]
+	#IO_DATA
+	io_event = io_Element[0:2]
+	io_num = int(io_Element[2:4],16)
+	io_1byte = int(io_Element[4:6],16)  #number 1byte io data
+	io_pair_1byte = dict()
+	io_pair_2byte = dict()
+	io_code = [] 
+	io_value = []
+	i=0
+	while(i < io_1byte*4):  
+			io_code = int(io_Element[i+6:i+8],16)
+			io_value = int(io_Element[i+8:i+10],16)
+			io_pair_1byte[io_code]= io_value
+			print i
+			print io_code
+			temp = i + 10			
+			i = i + 4
+					
+	i = temp
+	print "2 %s" %int(io_Element[i:i+2],16)
+	m = 0 	
+	io_2byte = int(io_Element[i:i+2],16)
+	print io_Element
+	while(m <=io_2byte*6-2) :  
+			io_code = io_Element[m+i+2:m+i+4]
+			io_value = io_Element[m+i+4:m+i+8]
+			io_pair_2byte[io_code]= io_value
+			m = m + 8		
+	print "head ------- %s " %(head)   
+	print "avl_len ------%s" %(avl_len)
+	print "avl_data -------%s" %(avl_data)
+	print "timestamp -------%s" %(timestamp)
+	print "priority -------%s" %(priority)
+	print "gps_element-------%s" %(gps_element)
+	print "longitude ------%s" %(longitude)
+	print "lattitude ------%s" %(lattitude)
+	print "alt------ %s" %(alt)
+	print "angle ------%s" %(angle)
+	print "speed----- %s" %(speed)
+	print "Satellites ------%s" %(Satellites)	
+	print "io_1byt----------%s" %(io_1byte)
+	print "io_pair_1byte -------%s" %(io_pair_1byte) 	
+	print "io_pair_2byte -------%s" %(io_pair_2byte)
+
