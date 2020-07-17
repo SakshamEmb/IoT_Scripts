@@ -72,9 +72,6 @@ while i < n :
 		else: count3 = 0 	
 	i = i+1 
 	
-#print io1 
-#print io2
-#print "-----------------------------------------ROUGH WORK-------------------------------------"
 print "Ignition toggled this many times ===== %s"  %(count)
 print "Tamper Bit toggled this many times ===== %s"  %(count1)
 print "Check ===== %s"  %(check)
