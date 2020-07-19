@@ -13,6 +13,9 @@ count1 = 0
 count3 = 0 
 panic = 0
 check =0  
+# filter out A packets from the file ----TASK1
+# filter out speed = 0 packets 
+# save external voltage packets 
 def flag(x,b,count):   # detects fluctuating output 
 	x = int(x)
 	b = int(b)
