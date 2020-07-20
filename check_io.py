@@ -1,10 +1,9 @@
 import pandas as pd
 import sys
 
-s1 = sys.argv
-csvfile = s1.pop()
+rd = sys.argv
+csvfile = rd.pop()
 data = pd.read_csv(csvfile)
-#data = pd.read_csv("iostate.csv")
 d1 = data["ioState"].to_numpy()
 #print d1
 io = []
