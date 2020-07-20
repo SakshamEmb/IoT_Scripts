@@ -1,5 +1,9 @@
 import pandas as pd
-data = pd.read_csv("iostate.csv")
+import sys
+
+s1 = sys.argv
+csvfile = s1.pop()
+data = pd.read_csv(csvfile)
 d1 = data["ioState"].to_numpy()
 #print d1
 io = []
@@ -71,13 +75,13 @@ while i < n :
 		#print count3
 	elif count3>=1000 or io2[i]==1:
 		if count3>=1000:
-			print "panic" 
+			print("panic") 
 			panic = 1 
 		else: count3 = 0 	
 	i = i+1 
 	
-print "Ignition toggled this many times ===== %s"  %(count)
-print "Tamper Bit toggled this many times ===== %s"  %(count1)
-print "Check ===== %s"  %(check)
-print "Installation Issue ==== %s" %(panic)
+print("Ignition toggled this many times ===== %d"  % count)
+print("Tamper Bit toggled this many times ===== %d" % count1)
+print("Check ===== %d" %check)
+print("Installation Issue ==== %d" % panic)
 #print "-----------------------------------------ROUGH WORK-------------------------------------"
