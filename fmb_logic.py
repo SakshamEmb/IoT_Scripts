@@ -1,11 +1,13 @@
 import pandas as pd
 import sys
-
+a=1
 s1 = sys.argv
 csvfile = s1.pop()
 data = pd.read_csv(csvfile)
-d1 = data["ioState"].to_numpy()
-#print d1
+# filter out A packets from the file ----TASK1
+filtered = data[data['locationReliable']==True]
+print(filtered)
+d1 = filtered["ioState"].to_numpy()
 io = []
 io1 = []
 io2 = []
@@ -17,7 +19,8 @@ count1 = 0
 count3 = 0 
 panic = 0
 check =0  
-# filter out A packets from the file ----TASK1
+#for result in data.LocationReliable:
+#	if re.search('TRUE',result):
 # filter out speed = 0 packets 
 def flag(x,b,count):   # detects fluctuating output 
 	x = int(x)
