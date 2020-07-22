@@ -7,7 +7,11 @@ data = pd.read_csv(csvfile)
 # filter out A packets from the file ----TASK1
 filtered = data[data['locationReliable']==True]
 print(filtered)
+
 d1 = filtered["ioState"].to_numpy()
+speed = filtered["speed"].to_numpy()
+battery1 = filtered[filtered['speed']==0].to_numpy() # speed = 0 
+
 io = []
 io1 = []
 io2 = []
@@ -19,21 +23,33 @@ count1 = 0
 count3 = 0 
 panic = 0
 check =0  
+y = 0 
+num = 10
 #for result in data.LocationReliable:
 #	if re.search('TRUE',result):
 # filter out speed = 0 packets 
-def flag(x,b,count):   # detects fluctuating output 
+battcheck = 0
+error = 0  
+
+def flag(x,b,count,index):   # detects fluctuating output # present value , previous value
 	x = int(x)
 	b = int(b)
 	d = count
+	ix = index
 	#print a,b
 	if x != b:
 		d = d + 1
 		#print 'here'
+		if x==1 & b==0:
+			battcheck = batterycheck(ix,battery1)
 		return d
 	else :
 		return d	
- 	
+def batterycheck(index,battery1):
+	i1 = index
+	batt = battery1
+	if batt[i1]>=24.5 & batt[i1]<=26 :# check for trucksr
+		return 1  		
 def convert2byte(argument):
 	switcher = {
 		1: '0000000',
@@ -50,24 +66,44 @@ while i < n :
 	f = io[i]
 	a = str(f)
 	val = len(a)
-	#rint val
+	#print(val)
 	if val <8:	
 		b = convert2byte(val)
 		a = b + a	
+
 	if int(a[1]) == 1:
 		io1.append(1)
 	else : io1.append(0)
 	temp = io1[i]
 	if i>1 :
 		#print count 
-		count = flag(temp,io1[i-1],count)
+		count = flag(temp,io1[i-1],count,i)
+
+
 	if int(a[0]) == 1:
 		io2.append(1)
 	else : io2.append(0)
 	temp2= io2[i]
 	if i>1 :
 		#print count1 
-		count1 = flag(temp2,io2[i-1],count1)
+		count1 = flag(temp2,io2[i-1],count1,i)
+		x = count1
+		#print(" x === %s" %(x)) 
+		if i>num:
+			if x-y > 4 & error == 0:
+				print(" x-y == %s" %(x-y))
+				print(" Loose Connection with battery")
+				error = 1  
+			elif error == 0:
+				#CHECK BATTERY VOLTAGE 
+				if battcheck == 1 :
+					print(" Mark threshhold voltage change required ")
+				else :
+					print("Move ON")
+			
+			y = x
+			num = num + 10  
+				
 	if io1[i]==1 & io2[i]==1 : check  = check + 1
 	
 
@@ -76,10 +112,12 @@ while i < n :
 		#print count3
 	elif count3>=1000 or io2[i]==1:
 		if count3>=1000:
-			print("panic") 
+			#print("panic") 
 			panic = 1 
 		else: count3 = 0 	
-	i = i+1 
+	i = i+1 	
+
+#LOGIC
 	
 print("Ignition toggled this many times ===== %d"  % count)
 print("Tamper Bit toggled this many times ===== %d" % count1)
