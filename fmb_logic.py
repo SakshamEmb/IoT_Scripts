@@ -6,12 +6,12 @@ csvfile = s1.pop()
 data = pd.read_csv(csvfile)
 # filter out A packets from the file ----TASK1
 filtered = data[data['locationReliable']==True]
-print(filtered)
-
 d1 = filtered["ioState"].to_numpy()
 speed = filtered["speed"].to_numpy()
-battery1 = filtered[filtered['speed']==0].to_numpy() # speed = 0 
-battery2 = filtered[filtered['speed']!=0].to_numpy()
+battery1 = filtered[filtered['speed']==0] # speed = 0 
+battery2 = filtered[filtered['speed']!=0]
+battery1 = battery1["vehicleBatteryLevel"].to_numpy()
+battery2 = battery2["vehicleBatteryLevel"].to_numpy()
 io = []
 io1 = []
 io2 = []
@@ -46,8 +46,9 @@ def flag(x,b,count,index):   # detects fluctuating output # present value , prev
 		return d
 	else :
 		return d
-def battcnt(voltage)
-	if voltage>13.2:
+def battcnt(voltage,i):
+	volt = voltage[i]
+	if volt>13.2:
 		cnt=cnt+1
 		return 1 
 	else :
@@ -100,12 +101,12 @@ while i < n :
 	
 	
 	if i>1 :
-		#print count1 
+		#print count1
+		#print(battery2)
 		count1 = flag(temp2,io2[i-1],count1,i)
 		x = count1
 		#print(" x === %s" %(x)) 
-		batt2 = battery2[i]
-		battbit = battcnt(batt2)
+		battbit = battcnt(battery2,i)
 		if i>num:
 			if x-y > 4 and error == 0:
 				print(" x-y == %s" %(x-y))
