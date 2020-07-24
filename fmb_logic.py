@@ -76,6 +76,11 @@ def convert2byte(argument):
 	return switcher.get(argument)
 
 while i < n :
+	ind = i
+	if i>len(battery2)-1:
+		ind = len(battery2)-1
+	#if i>len(battery1)-1:
+	#	ind = len(battery1)-1
 	f = io[i]
 	a = str(f)
 	val = len(a)
@@ -106,7 +111,7 @@ while i < n :
 		count1 = flag(temp2,io2[i-1],count1,i)
 		x = count1
 		#print(" x === %s" %(x)) 
-		battbit = battcnt(battery2,i)
+		battbit = battcnt(battery2,ind)
 		if i>num:
 			if x-y > 4 and error == 0:
 				print(" x-y == %s" %(x-y))
