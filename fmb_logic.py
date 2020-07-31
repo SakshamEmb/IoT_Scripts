@@ -1,5 +1,6 @@
 import pandas as pd
 import sys
+import logging 
 a=1
 s1 = sys.argv
 csvfile = s1.pop()
@@ -9,9 +10,11 @@ filtered = data[data['locationReliable']==True]
 d1 = filtered["ioState"].to_numpy()
 speed = filtered["speed"].to_numpy()
 battery1 = filtered[filtered['speed']==0] # speed = 0 
-battery2 = filtered[filtered['speed']!=0]
+battery2 = filtered[filtered['speed']!=0] # speed > 0 
 battery1 = battery1["vehicleBatteryLevel"].to_numpy()
 battery2 = battery2["vehicleBatteryLevel"].to_numpy()
+timestamp = filtered["gpsTime"].to_numpy()
+print(timestamp)
 io_s = filtered[filtered['speed']!=0]
 io_s = io_s["ioState"].to_numpy()
 io = []
@@ -92,10 +95,11 @@ def convert2byte(argument):
 	return switcher.get(argument)
 
 sensor = input("Is sensor connected ? ")
-
+# How many sets do you want to check ?
 while i < n :
 	ind = i
 	i1 = i
+	# avoid index error
 	if i>len(battery2)-1:
 		ind = len(battery2)-1
 	if i1>len(io_s)-1:
@@ -147,11 +151,14 @@ while i < n :
 
 		#print(" x === %s" %(x)) 
 		battery_bit = battery_count(battery2,ind)
-		if i>num:
+
+		if i>num: # Time Stamp needed , availability , ioState`
 			if x-y > 4 and error == 0:
 				print(" x-y == %s" %(x-y))
 				print(" Loose Connection with battery")
-				error = 0 
+				logging.basicConfig(format='%(asctime)s %(message)s',datefmt = timestamp[i])
+				logging.warning('Speed is %d' %(speed[i]))
+				print(timestamp[i])
 			elif error == 0:
 				#CHECK BATTERY VOLTAGE 
 				if battery_check == 1 :
@@ -171,8 +178,9 @@ while i < n :
 								else :
 									print (" Ignition Wire to be Connected")	
 					else :
-						print(" TO MANUAL CHECK ")	
-			previous_v = count3			
+						print(" TO MANUAL CHECK ")
+						
+			previous_v = count3						
 			y = x
 			num = num + 10  
 
@@ -193,6 +201,6 @@ print(" Number of A packets ====> %s " %size)
 print(" Total Number of packets ====> %s" %size1)
 print("Ignition toggled this many times ===== %d"  % count)
 print("Tamper Bit toggled this many times ===== %d" % count1)
-print("Check ===== %d" %check)
-print("Installation Issue ==== %d" % panic)
+#print("Check ===== %d" %check)
+#print("Installation Issue ==== %d" % panic)
 #print "-----------------------------------------ROUGH WORK-------------------------------------"
