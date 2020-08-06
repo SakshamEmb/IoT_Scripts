@@ -61,7 +61,7 @@ def toggle_0_1(xp,xn,zp,zn):
 	zn= int(zn)
 	global wire_check
 
-	if xp == 0  and xn == 1 and yn == 1 and yp == 0 and mcb == 0 :
+	if xp == 0  and xn == 1 and yn == 1 and yp == 0 and wire_check == 0 :
 		wire_check = 1 
 
 def battery_count(voltage,i):
