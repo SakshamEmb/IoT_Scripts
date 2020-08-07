@@ -1,28 +1,25 @@
 import pandas as pd
 import sys
 import logging 
-a=1
-s1 = sys.argv
-csvfile = s1.pop()
-data = pd.read_csv(csvfile)
+
+CmdArgument = sys.argv
+csvFile = CmdArgument.pop()
+data = pd.read_csv(csvFile)
 # filter out A packets from the file ----TASK1
 filtered = data[data['locationReliable']==True]
-d1 = filtered["ioState"].to_numpy()
+io = filtered["ioState"].to_numpy()
 speed = filtered["speed"].to_numpy()
 battery1 = filtered[filtered['speed']==0] # speed = 0 
 battery2 = filtered[filtered['speed']!=0] # speed > 0 
 battery1 = battery1["vehicleBatteryLevel"].to_numpy()
 battery2 = battery2["vehicleBatteryLevel"].to_numpy()
 timestamp = filtered["gpsTime"].to_numpy()
-print(timestamp)
-io_s = filtered[filtered['speed']!=0]
-io_s = io_s["ioState"].to_numpy()
-io = []
+ioSpeed0 = filtered[filtered['speed']!=0]
+ioSpeed0 = ioSpeed0["ioState"].to_numpy()
 io1 = []
 io2 = []
 io3 = []
 io4 = []
-io = d1
 n = len(io)
 i = 0 
 count = 0
@@ -32,14 +29,16 @@ count3 = 0  #battery voltage over 13.2 count
 panic = 0
 check =0  
 y = 0 
-num = 10
+num = 10 
+batch = 10 
 #for result in data.LocationReliable:
 #	if re.search('TRUE',result):
 # filter out speed = 0 packets 
-battery_check = 0
+batteryCheck = 0
 error = 0  
-previous_v = 0 
-wire_check = 0 
+previousV = 0 
+wireFlag = 0 
+
 def flag(x,b,count,index):   # detects fluctuating output # present value , previous value
 	x = int(x)
 	b = int(b)
@@ -50,7 +49,7 @@ def flag(x,b,count,index):   # detects fluctuating output # present value , prev
 		d = d + 1
 		#print 'here'
 		if x==1 & b==0:
-			battery_check = batterycheck(ix,battery1)
+			batteryCheck = batteryFunction(ix,battery1)
 		return d
 	else :
 		return d
@@ -59,12 +58,12 @@ def toggle_0_1(xp,xn,zp,zn):
 	xp = int(xn)
 	zp = int(zp)
 	zn= int(zn)
-	global wire_check
+	global wireFlag
 
 	if xp == 0  and xn == 1 and yn == 1 and yp == 0 and mcb == 0 :
-		wire_check = 1 
+		wireFlag = 1 
 
-def battery_count(voltage,i):
+def batteryCount(voltage,i):
 	volt = voltage[i]
 	global count3
 	if volt<13.2:
@@ -72,12 +71,10 @@ def battery_count(voltage,i):
 		return 1 
 	else :
 		return 0	
-def batterycheck(index,battery1):
-	i1 = index
-	batt = battery1
-	if batt[i1]>=24.5 & batt[i1]<=26 :# check for trucksr
+def batteryFunction(index,battery):
+	if battery[index]>=24.5 & battery[index]<=26 :# check for trucksr
 		return 1  
-	elif batt[i1]>=12.5 & batt[i1]<=13:
+	elif battery[index]>=12.5 & battery[index]<=13:
 		return 2 
 	else :
 		return 0  
@@ -102,8 +99,8 @@ while i < n :
 	# avoid index error
 	if i>len(battery2)-1:
 		ind = len(battery2)-1
-	if i1>len(io_s)-1:
-		i1 = len(io_s) -1
+	if i1>len(ioSpeed0)-1:
+		i1 = len(ioSpeed0) -1
 
 	f = io[i] # All A packets 
 	a = str(f)
@@ -113,7 +110,7 @@ while i < n :
 		b = convert2byte(val)
 		a = b + a	
 
-	g = io_s[i1]  # A packets with speed >0
+	g = ioSpeed0[i1]  # A packets with speed >0
 	a1 =str(g)
 	val1 = len(a1)
 	if val1 <8:	
@@ -150,39 +147,40 @@ while i < n :
 		toggle_0_1(io3[i-1],temp3,io4[i-1],temp4)
 
 		#print(" x === %s" %(x)) 
-		battery_bit = battery_count(battery2,ind)
+		batteryFlag = batteryCount(battery2,ind)
 
 		if i>num: # Time Stamp needed , availability , ioState`
 			if x-y > 4 and error == 0:
 				print(" x-y == %s" %(x-y))
 				print(" Loose Connection with battery")
-				logging.basicConfig(format='%(asctime)s %(message)s',datefmt = timestamp[i])
-				logging.warning('Speed is %d' %(speed[i]))
+				#logging.basicConfig(format='%s %(message)s' %(timestamp[i]) )
 				print(timestamp[i])
+				logging.warning('   %s -------- Speed is %d  -------- batch number is %d ' %(timestamp[i],speed[i],num/10))
+				error = 0
 			elif error == 0:
 				#CHECK BATTERY VOLTAGE 
-				if battery_check == 1 :
+				if batteryCheck == 1 :
 					print(" Mark threshold voltage change required to 25.2 V")
 					error = 1
-				elif battery_check == 2 :
+				elif batteryCheck == 2 :
 					print(" Mark threshold voltage change required to 13.2 V")
 					error = 1
-				elif battery_check==0:
+				elif batteryCheck==0:
 				#CHECK VEHICLE BATTERY MISBEHAVIOUR	
-					if battery_bit == 1 and count3-previous_v>5: 
+					if batteryFlag == 1 and count3-previousV>5: 
 							if sensor == "yes":
 								print("Mark sensor connected ")
 							else :
-								if wire_check == 1 :
+								if wireFlag == 1 :
 									print("Mark Ignition Wire Connected")
 								else :
 									print (" Ignition Wire to be Connected")	
 					else :
 						print(" TO MANUAL CHECK ")
 						
-			previous_v = count3						
+			previousV = count3						
 			y = x
-			num = num + 10  
+			num = num + batch  
 
 	if io1[i]==0 & count2<=1000 : 
 		count2 = count2 + 1 
