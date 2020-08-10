@@ -3,8 +3,11 @@ import sys
 import logging 
 
 CmdArgument = sys.argv
-csvFile = CmdArgument.pop()
+sensor = CmdArgument.pop()      #Sensor Added or not
+batch = int(CmdArgument.pop())  #BatchNumber 
+csvFile = CmdArgument.pop()     #csvFile 
 data = pd.read_csv(csvFile)
+
 # filter out A packets from the file ----TASK1
 filtered = data[data['locationReliable']==True]
 io = filtered["ioState"].to_numpy()
@@ -30,7 +33,7 @@ panic = 0
 check =0  
 y = 0 
 num = 10 
-batch = 10 
+#batch = 10 
 #for result in data.LocationReliable:
 #	if re.search('TRUE',result):
 # filter out speed = 0 packets 
@@ -91,7 +94,7 @@ def convert2byte(argument):
 	}
 	return switcher.get(argument)
 
-sensor = input("Is sensor connected ? ")
+#sensor = input("Is sensor connected ? ") Add feature in Command Line Arguments
 # How many sets do you want to check ?
 while i < n :
 	ind = i
