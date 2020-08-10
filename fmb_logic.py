@@ -60,8 +60,8 @@ def toggle_0_1(xp,xn,zp,zn):
 	zn= int(zn)
 	global wireFlag
 
-	if xp == 0  and xn == 1 and yn == 1 and yp == 0 and wire_check == 0 :
-		wire_check = 1 
+	if xp == 0  and xn == 1 and yn == 1 and yp == 0 and wireFlag== 0 :
+		wireFlag = 1 
 
 def batteryCount(voltage,i):
 	volt = voltage[i]
